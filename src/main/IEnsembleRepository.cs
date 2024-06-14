@@ -8,6 +8,6 @@ namespace ei8.Cortex.Coding
     {
         Task<IDictionary<string, Neuron>> GetExternalReferencesAsync(string userId, params string[] keys);
 
-        Task<Ensemble> GetByQueriesAsync(string userId, params NeuronQuery[] queries);
+        Task<Ensemble> GetByQueryAsync(string userId, NeuronQuery query);
     }
 }

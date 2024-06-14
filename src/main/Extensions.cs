@@ -7,7 +7,7 @@ namespace ei8.Cortex.Coding
 {
     public static class Extensions
     {
-        #region INeuronRepository
+        #region IEnsembleRepository
         public static async Task<Neuron> GetExternalReferenceAsync(this IEnsembleRepository neuronRepository, string userId, string key) =>
              (await neuronRepository.GetExternalReferencesAsync(userId, key)).Values.SingleOrDefault();
 
@@ -61,6 +61,25 @@ namespace ei8.Cortex.Coding
         #endregion
 
         #region Library.Common to Ensemble
+        public static Ensemble ToEnsemble(this Library.Common.QueryResult<Library.Common.Neuron> queryResult)
+        {
+            var allNs = queryResult.Items.SelectMany(n => n.Traversals.SelectMany(t => t.Neurons));
+            var allTs = queryResult.Items.SelectMany(n => n.Traversals.SelectMany(t => t.Terminals));
+
+            var eNs = allNs.GroupBy(n => n.Id)
+                .Select(g => g.First())
+                .Select(n => n.ToEnsemble());
+            var eTs = allTs.GroupBy(t => t.Id)
+                .Select(g => g.First())
+                .Select(t => t.ToEnsemble());
+
+            return new Ensemble(
+                eNs.Cast<IEnsembleItem>().Concat(
+                    eTs.Cast<IEnsembleItem>()
+                ).ToDictionary(ei => ei.Id)
+            );
+        }
+
         public static Ensemble ToEnsemble(this IEnumerable<Library.Common.QueryResult<Library.Common.Neuron>> queryResults)
         {
             var allNs = queryResults.SelectMany(qr => qr.Items.SelectMany(n => n.Traversals.SelectMany(t => t.Neurons)));
