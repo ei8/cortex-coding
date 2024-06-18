@@ -42,24 +42,6 @@ namespace ei8.Cortex.Coding
         public static string ToExternalReferenceKeyString(this Enum value) => value.ToString();
         #endregion
 
-        #region Neuron
-        public static IEnumerable<Terminal> GetDendrites(this Neuron neuron, Ensemble ensemble) =>
-            ensemble.GetItems<Terminal>().Where(t => t.PostsynapticNeuronId == neuron.Id);
-
-        public static IEnumerable<Terminal> GetTerminals(this Neuron neuron, Ensemble ensemble) =>
-            ensemble.GetItems<Terminal>().Where(t => t.PresynapticNeuronId == neuron.Id);
-
-        public static IEnumerable<Neuron> GetPresynapticNeurons(this Neuron neuron, Ensemble ensemble) =>
-            neuron.GetDendrites(ensemble)
-                 .Select(t => {
-                     neurUL.Common.Domain.Model.AssertionConcern.AssertStateTrue(
-                         ensemble.TryGetById(t.PresynapticNeuronId, out Neuron result),
-                         "Neuron with specified Presynaptic Neuron Id was not found."
-                         );
-                     return result;
-                 });
-        #endregion
-
         #region Library.Common to Ensemble
         public static Ensemble ToEnsemble(this Library.Common.QueryResult<Library.Common.Neuron> queryResult)
         {

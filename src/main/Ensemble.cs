@@ -85,5 +85,21 @@ namespace ei8.Cortex.Coding
             commonItemsInNewDictionary.ForEach(ci => ValidateItemReplacementType(ci.Value, itemsDictionary[ci.Key]));
             ensemble.itemsDictionary.ToList().ForEach(ni => AddReplaceCore(ni.Value, itemsDictionary, commonItemsInNewDictionary.Contains(ni)));
         }
+
+        public IEnumerable<Terminal> GetDendrites(Guid neuronId) =>
+            this.GetItems<Terminal>().Where(t => t.PostsynapticNeuronId == neuronId);
+
+        public IEnumerable<Terminal> GetTerminals(Guid neuronId) =>
+            this.GetItems<Terminal>().Where(t => t.PresynapticNeuronId == neuronId);
+
+        public IEnumerable<Neuron> GetPresynapticNeurons(Guid neuronId) =>
+            this.GetDendrites(neuronId)
+                 .Select(t => {
+                     neurUL.Common.Domain.Model.AssertionConcern.AssertStateTrue(
+                         this.TryGetById(t.PresynapticNeuronId, out Neuron result),
+                         "Neuron with specified Presynaptic Neuron Id was not found."
+                         );
+                     return result;
+                 });
     }
 }
