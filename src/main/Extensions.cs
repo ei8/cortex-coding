@@ -45,7 +45,8 @@ namespace ei8.Cortex.Coding
         #region Library.Common to Ensemble
         public static Ensemble ToEnsemble(this Library.Common.QueryResult<Library.Common.Neuron> queryResult)
         {
-            var allNs = queryResult.Items.SelectMany(n => n.Traversals.SelectMany(t => t.Neurons));
+            var allNs = queryResult.Items;
+            allNs = allNs.Concat(queryResult.Items.SelectMany(n => n.Traversals.SelectMany(t => t.Neurons)));
             var allTs = queryResult.Items.SelectMany(n => n.Traversals.SelectMany(t => t.Terminals));
 
             var eNs = allNs.GroupBy(n => n.Id)

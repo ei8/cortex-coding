@@ -60,9 +60,9 @@ namespace ei8.Cortex.Coding
         {
             TEnsembleItem result = default;
             // if not found in ensemble
-            if (!TryGetById(value.Id, out result))
+            if (!this.TryGetById(value.Id, out result))
             {
-                AddReplace(value);
+                this.AddReplace(value);
                 result = value;
             }
             return result;
