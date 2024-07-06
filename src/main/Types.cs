@@ -10,4 +10,8 @@ namespace ei8.Cortex.Coding
         NotSet,
         Excite
     }
+    public static class Constants
+    {
+        public const string TypeNamePropertyNameSeparator = ":";
+    }
 }

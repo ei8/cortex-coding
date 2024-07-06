@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding
@@ -40,6 +41,8 @@ namespace ei8.Cortex.Coding
 
         public static string ToExternalReferenceKeyString(this Type value) => value.FullName;
         public static string ToExternalReferenceKeyString(this Enum value) => value.ToString();
+        public static string ToExternalReferenceKeyString(this PropertyInfo property) =>
+            $"{property.DeclaringType.ToExternalReferenceKeyString()}{Constants.TypeNamePropertyNameSeparator}{property.Name}";
         #endregion
 
         #region Library.Common to Ensemble
