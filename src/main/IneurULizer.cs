@@ -7,6 +7,6 @@ namespace ei8.Cortex.Coding
 {
     public interface IneurULizer
     {
-        Task<Ensemble> neurULizeAsync<TValue>(TValue value, IneurULizationOptions options);
+        Task<Ensemble> neurULizeAsync<TValue>(TValue value, IneurULizerOptions options);
     }
 }

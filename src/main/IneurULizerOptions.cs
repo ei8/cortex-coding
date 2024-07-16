@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ei8.Cortex.Coding
 {
-    public interface IneurULizationOptions
+    public interface IneurULizerOptions
     {
     }
 }

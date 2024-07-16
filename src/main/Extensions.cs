@@ -39,7 +39,7 @@ namespace ei8.Cortex.Coding
             return origDict.ToDictionary(kvpK => keys.Single(t => keyConverter(t) == kvpK.Key), kvpE => kvpE.Value);
         }
 
-        public static string ToExternalReferenceKeyString(this Type value) => value.FullName;
+        public static string ToExternalReferenceKeyString(this Type value) => Nullable.GetUnderlyingType(value) != null ? Nullable.GetUnderlyingType(value).FullName : value.FullName;
         public static string ToExternalReferenceKeyString(this Enum value) => value.ToString();
         public static string ToExternalReferenceKeyString(this PropertyInfo property) =>
             $"{property.DeclaringType.ToExternalReferenceKeyString()}{Constants.TypeNamePropertyNameSeparator}{property.Name}";
@@ -87,20 +87,20 @@ namespace ei8.Cortex.Coding
 
         public static Neuron ToEnsemble(
             this Library.Common.Neuron value
-            )
-        {
-            Guid? g = null;
-
-            if (Guid.TryParse(value.Region?.Id, out Guid gr))
-                g = gr;
-
-            return new Neuron(
+            ) => new Neuron(
                 Guid.Parse(value.Id),
                 value.Tag,
                 value.ExternalReferenceUrl,
-                g
+                Guid.TryParse(value.Region?.Id, out Guid regionId) ? regionId : (Guid?) null,
+                value.Region?.Tag,
+                DateTimeOffset.TryParse(value.Creation.Timestamp, out DateTimeOffset creationTimestamp) ? creationTimestamp : (DateTimeOffset?) null,
+                Guid.TryParse(value.Creation.Author.Id, out Guid authorId) ? authorId : Guid.Empty,
+                value.Creation.Author.Tag,
+                DateTimeOffset.TryParse(value.UnifiedLastModification.Timestamp, out DateTimeOffset unifiedLastModificationTimestamp) ? unifiedLastModificationTimestamp : (DateTimeOffset?) null,
+                Guid.TryParse(value.UnifiedLastModification.Author.Id, out Guid unifiedAuthorId) ? unifiedAuthorId : (Guid?) null,
+                value.UnifiedLastModification.Author.Tag,
+                value.Url
             );
-        }
 
         public static Terminal ToEnsemble(
             this Library.Common.Terminal value
