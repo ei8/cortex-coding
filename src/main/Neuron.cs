@@ -16,7 +16,8 @@ namespace ei8.Cortex.Coding
             DateTimeOffset? unifiedLastModificationTimestamp,
             Guid? unifiedLastModificationAuthorId,
             string unifiedLastModificationAuthorTag,
-            string url
+            string url,
+            int version
             ) : this(id, false, tag, externalReferenceUrl, regionId)
         {
             this.RegionTag = regionTag;
@@ -27,6 +28,7 @@ namespace ei8.Cortex.Coding
             this.UnifiedLastModificationAuthorId = unifiedLastModificationAuthorId;
             this.UnifiedLastModificationAuthorTag = unifiedLastModificationAuthorTag;
             this.Url = url;
+            this.Version = version;
         }
 
         private Neuron(Guid id, bool isTransient, string tag, string externalReferenceUrl, Guid? regionId)
@@ -54,9 +56,9 @@ namespace ei8.Cortex.Coding
         public bool IsTransient { get; }
         
         public Guid Id { get; private set; }
-        public string Tag { get; private set; }
-        public string ExternalReferenceUrl { get; private set; }
-        public Guid? RegionId { get; private set; }
+        public string Tag { get; set; }
+        public string ExternalReferenceUrl { get; set; }
+        public Guid? RegionId { get; set; }
         public string RegionTag { get; private set; }
         public DateTimeOffset? CreationTimestamp { get; private set; }
         public Guid CreationAuthorId { get; private set; }
@@ -65,5 +67,6 @@ namespace ei8.Cortex.Coding
         public Guid? UnifiedLastModificationAuthorId { get; private set; }
         public string UnifiedLastModificationAuthorTag { get; private set; }
         public string Url { get; }
+        public int Version { get; private set; }
     }
 }

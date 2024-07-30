@@ -99,7 +99,8 @@ namespace ei8.Cortex.Coding
                 DateTimeOffset.TryParse(value.UnifiedLastModification.Timestamp, out DateTimeOffset unifiedLastModificationTimestamp) ? unifiedLastModificationTimestamp : (DateTimeOffset?) null,
                 Guid.TryParse(value.UnifiedLastModification.Author.Id, out Guid unifiedAuthorId) ? unifiedAuthorId : (Guid?) null,
                 value.UnifiedLastModification.Author.Tag,
-                value.Url
+                value.Url,
+                value.Version
             );
 
         public static Terminal ToEnsemble(

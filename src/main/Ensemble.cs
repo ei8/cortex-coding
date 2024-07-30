@@ -34,6 +34,8 @@ namespace ei8.Cortex.Coding
             return bResult;
         }
 
+        public IEnumerable<IEnsembleItem> GetItems() => this.GetItems<IEnsembleItem>();
+
         public IEnumerable<T> GetItems<T>()
             where T : IEnsembleItem
             => itemsDictionary.Values.OfType<T>();
@@ -55,12 +57,12 @@ namespace ei8.Cortex.Coding
             itemsDictionary.Add(item.Id, item);
         }
 
-        public TEnsembleItem Obtain<TEnsembleItem>(TEnsembleItem value)
+        public TEnsembleItem Obtain<TEnsembleItem>(TEnsembleItem value, bool forceReplace = false)
             where TEnsembleItem : IEnsembleItem
         {
             TEnsembleItem result = default;
             // if not found in ensemble
-            if (!this.TryGetById(value.Id, out result))
+            if (!this.TryGetById(value.Id, out result) || forceReplace)
             {
                 this.AddReplace(value);
                 result = value;

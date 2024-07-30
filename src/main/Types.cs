@@ -5,13 +5,20 @@ using System.Text;
 namespace ei8.Cortex.Coding
 {
     /// <summary>
-    /// Defines the Neuron property that is used to match records in TryParse and GetQueries methods.
+    /// Defines the Neuron property that is used to match Neurons in TryParse and GetQueries methods.
     /// </summary>
     public enum ValueMatchBy
     {
         NotSet,
         Id,
         Tag
+    }
+
+    public enum WriteMode
+    {
+        NotSet,
+        Create,
+        Update
     }
 
     public enum NeurotransmitterEffect
