@@ -14,6 +14,12 @@ namespace ei8.Cortex.Coding
         Tag
     }
 
+    public enum ReadMode
+    {
+        NoSet,
+        First,
+        All
+    }
     public enum WriteMode
     {
         NotSet,

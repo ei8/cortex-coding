@@ -1,51 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding
 {
-    public static class Extensions
+    public static class LibraryExtensions
     {
-        #region IEnsembleRepository
-        public static async Task<Neuron> GetExternalReferenceAsync(this IEnsembleRepository neuronRepository, string userId, string key) =>
-             (await neuronRepository.GetExternalReferencesAsync(userId, key)).Values.SingleOrDefault();
-
-        public static async Task<Neuron> GetExternalReferenceAsync(
-            this IEnsembleRepository neuronRepository,
-            string userId,
-            object key
-            ) =>
-            (await neuronRepository.GetExternalReferencesAsync(userId, key)).Values.SingleOrDefault();
-
-        public static async Task<IDictionary<object, Neuron>> GetExternalReferencesAsync(
-            this IEnsembleRepository neuronRepository,
-            string userId,
-            params object[] keys
-            )
-        {
-            var keyConverter = new Func<object, string>(o =>
-            {
-                var result = o as string;
-                if (o is Type)
-                    result = ((Type)o).ToExternalReferenceKeyString();
-                else if (o is Enum)
-                    result = ((Enum)o).ToExternalReferenceKeyString();
-
-                return result;
-            });
-            var origDict = await neuronRepository.GetExternalReferencesAsync(userId, keys.Select(t => keyConverter(t)).ToArray());
-            return origDict.ToDictionary(kvpK => keys.Single(t => keyConverter(t) == kvpK.Key), kvpE => kvpE.Value);
-        }
-
-        public static string ToExternalReferenceKeyString(this Type value) => Nullable.GetUnderlyingType(value) != null ? Nullable.GetUnderlyingType(value).FullName : value.FullName;
-        public static string ToExternalReferenceKeyString(this Enum value) => value.ToString();
-        public static string ToExternalReferenceKeyString(this PropertyInfo property) =>
-            $"{property.DeclaringType.ToExternalReferenceKeyString()}{Constants.TypeNamePropertyNameSeparator}{property.Name}";
-        #endregion
-
-        #region Library.Common to Ensemble
         public static Ensemble ToEnsemble(this Library.Common.QueryResult<Library.Common.Neuron> queryResult)
         {
             var allNs = queryResult.Items;
@@ -91,13 +51,13 @@ namespace ei8.Cortex.Coding
                 Guid.Parse(value.Id),
                 value.Tag,
                 value.ExternalReferenceUrl,
-                Guid.TryParse(value.Region?.Id, out Guid regionId) ? regionId : (Guid?) null,
+                Guid.TryParse(value.Region?.Id, out Guid regionId) ? regionId : (Guid?)null,
                 value.Region?.Tag,
-                DateTimeOffset.TryParse(value.Creation.Timestamp, out DateTimeOffset creationTimestamp) ? creationTimestamp : (DateTimeOffset?) null,
+                DateTimeOffset.TryParse(value.Creation.Timestamp, out DateTimeOffset creationTimestamp) ? creationTimestamp : (DateTimeOffset?)null,
                 Guid.TryParse(value.Creation.Author.Id, out Guid authorId) ? authorId : Guid.Empty,
                 value.Creation.Author.Tag,
-                DateTimeOffset.TryParse(value.UnifiedLastModification.Timestamp, out DateTimeOffset unifiedLastModificationTimestamp) ? unifiedLastModificationTimestamp : (DateTimeOffset?) null,
-                Guid.TryParse(value.UnifiedLastModification.Author.Id, out Guid unifiedAuthorId) ? unifiedAuthorId : (Guid?) null,
+                DateTimeOffset.TryParse(value.UnifiedLastModification.Timestamp, out DateTimeOffset unifiedLastModificationTimestamp) ? unifiedLastModificationTimestamp : (DateTimeOffset?)null,
+                Guid.TryParse(value.UnifiedLastModification.Author.Id, out Guid unifiedAuthorId) ? unifiedAuthorId : (Guid?)null,
                 value.UnifiedLastModification.Author.Tag,
                 value.Url,
                 value.Version
@@ -117,6 +77,5 @@ namespace ei8.Cortex.Coding
 
             return result;
         }
-        #endregion
     }
 }

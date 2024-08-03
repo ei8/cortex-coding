@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ei8.Cortex.Coding
+﻿namespace ei8.Cortex.Coding
 {
-    public interface IneurULizerOptions
+    public interface IneurULizerOptions<TOperationOptions, TMode>
+        where TOperationOptions : IOperationOptions<TMode>
+        where TMode : struct, System.Enum
     {
-        WriteMode WriteMode { get; }
+        TOperationOptions OperationOptions { get; }
     }
 }
