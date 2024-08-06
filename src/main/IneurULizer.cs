@@ -8,7 +8,7 @@ namespace ei8.Cortex.Coding
         Task<Ensemble> neurULizeAsync<TValue, TOptions>(TValue value, TOptions options)
             where TOptions : IneurULizerWriteOptions;
 
-        IEnumerable<TValue> DeneurULize<TValue, TOptions>(Ensemble value, TOptions options)
+        Task<IEnumerable<TValue>> DeneurULizeAsync<TValue, TOptions>(Ensemble value, TOptions options)
             where TValue : class, new()
             where TOptions : IneurULizerReadOptions;
     }

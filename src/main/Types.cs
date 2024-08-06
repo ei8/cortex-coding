@@ -20,6 +20,7 @@ namespace ei8.Cortex.Coding
         First,
         All
     }
+
     public enum WriteMode
     {
         NotSet,
