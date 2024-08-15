@@ -103,5 +103,58 @@ namespace ei8.Cortex.Coding
                          );
                      return result;
                  });
+
+        public IEnumerable<Neuron> GetPostsynapticNeurons(Guid neuronId) =>
+            this.GetTerminals(neuronId)
+                 .Select(t => {
+                     neurUL.Common.Domain.Model.AssertionConcern.AssertStateTrue(
+                         this.TryGetById(t.PostsynapticNeuronId, out Neuron result),
+                         "Neuron with specified Postsynaptic Neuron Id was not found."
+                         );
+                     return result;
+                 });
+
+        // TODO: enable if needed by client code
+        // public IDictionary<T, Neuron> GetInterneurons<T>(
+        //    Neuron presynaptic, 
+        //    IEnumerable<T> ids, params Func<T, Neuron>[] postsynapticRetrievers
+        //    )
+        //{
+        //    Dictionary<T, Neuron> result = new Dictionary<T, Neuron>();
+
+        //    var prePosts = this.GetPostsynapticNeurons(presynaptic.Id);
+
+        //    foreach(T id in ids)
+        //    {
+        //        IEnumerable<Neuron> postPres = null;
+        //        foreach (var pr in postsynapticRetrievers)
+        //        {
+        //            var post = pr(id);
+        //            if (post != null)
+        //            {
+        //                if (postsynapticRetrievers.First() == pr)
+        //                    postPres = this.GetPresynapticNeurons(post.Id);
+        //                else
+        //                {
+        //                    var tempPostPres = this.GetPresynapticNeurons(post.Id);
+        //                    postPres = postPres.Intersect(tempPostPres);
+        //                }
+
+        //                if (postPres == null || !postPres.Any())
+        //                    break;
+        //            }
+        //        }
+
+        //        Neuron match = null;
+
+        //        if (postPres != null &&
+        //            (match = prePosts.Intersect(postPres)
+        //            .FirstOrDefault(pp => !result.ContainsValue(pp))
+        //            ) != null)
+        //            result.Add(id, match);
+        //    }
+
+        //    return result;
+        //}
     }
 }
