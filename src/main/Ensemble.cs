@@ -104,15 +104,18 @@ namespace ei8.Cortex.Coding
                      return result;
                  });
 
-        public IEnumerable<Neuron> GetPostsynapticNeurons(Guid neuronId) =>
-            this.GetTerminals(neuronId)
-                 .Select(t => {
+        public IEnumerable<Neuron> GetPostsynapticNeurons(Guid neuronId)
+        {
+            var terminals = this.GetTerminals(neuronId);
+            return terminals.Select(t =>
+                 {
                      neurUL.Common.Domain.Model.AssertionConcern.AssertStateTrue(
                          this.TryGetById(t.PostsynapticNeuronId, out Neuron result),
                          "Neuron with specified Postsynaptic Neuron Id was not found."
                          );
                      return result;
                  });
+        }
 
         // TODO: enable if needed by client code
         // public IDictionary<T, Neuron> GetInterneurons<T>(
