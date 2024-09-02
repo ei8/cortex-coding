@@ -2,6 +2,7 @@
 
 namespace ei8.Cortex.Coding
 {
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
     public class neurULClassAttribute : Attribute
     {
         public neurULClassAttribute(Type type) : this(type, null)

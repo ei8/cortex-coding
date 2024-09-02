@@ -20,5 +20,7 @@
         public string Value { get; }
         public ValueMatchBy ValueMatchBy { get; }
         public INeuronProperty NeuronProperty { get; }
+
+        public string PropertyName => this.Key.Split(':')[1];
     }
 }

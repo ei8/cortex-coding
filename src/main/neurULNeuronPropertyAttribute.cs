@@ -2,6 +2,7 @@
 
 namespace ei8.Cortex.Coding
 {
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
     public class neurULNeuronPropertyAttribute : Attribute
     {
         public neurULNeuronPropertyAttribute() : this(null)
@@ -25,6 +26,7 @@ namespace ei8.Cortex.Coding
 
         public string PropertyName { get; }
 
+        // TODO: remove since this is unnecessary
         public bool IsReadOnly { get; }
     }
 }
