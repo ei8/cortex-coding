@@ -42,11 +42,11 @@ namespace ei8.Cortex.Coding
 
         public void AddReplace(IEnsembleItem item)
         {
-            bool replacing = itemsDictionary.TryGetValue(item.Id, out IEnsembleItem oldItem);
+            bool replacing = this.itemsDictionary.TryGetValue(item.Id, out IEnsembleItem oldItem);
             if (replacing)
-                ValidateItemReplacementType(item, oldItem);
+                Ensemble.ValidateItemReplacementType(item, oldItem);
 
-            AddReplaceCore(item, itemsDictionary, replacing);
+            Ensemble.AddReplaceCore(item, this.itemsDictionary, replacing);
         }
 
         private static void AddReplaceCore(IEnsembleItem item, IDictionary<Guid, IEnsembleItem> itemsDictionary, bool replacing)
@@ -88,21 +88,27 @@ namespace ei8.Cortex.Coding
             ensemble.itemsDictionary.ToList().ForEach(ni => AddReplaceCore(ni.Value, itemsDictionary, commonItemsInNewDictionary.Contains(ni)));
         }
 
+        public void Remove(Guid id) => this.itemsDictionary.Remove(id);
+
         public IEnumerable<Terminal> GetDendrites(Guid neuronId) =>
             this.GetItems<Terminal>().Where(t => t.PostsynapticNeuronId == neuronId);
 
         public IEnumerable<Terminal> GetTerminals(Guid neuronId) =>
             this.GetItems<Terminal>().Where(t => t.PresynapticNeuronId == neuronId);
 
-        public IEnumerable<Neuron> GetPresynapticNeurons(Guid neuronId) =>
-            this.GetDendrites(neuronId)
-                 .Select(t => {
+        public IEnumerable<Neuron> GetPresynapticNeurons(Guid neuronId)
+        {
+            return this.GetDendrites(neuronId)
+                 .Select(t =>
+                 {
+                     this.TryGetById(t.PresynapticNeuronId, out Neuron result);
                      neurUL.Common.Domain.Model.AssertionConcern.AssertStateTrue(
-                         this.TryGetById(t.PresynapticNeuronId, out Neuron result),
-                         "Neuron with specified Presynaptic Neuron Id was not found."
+                         result != null,
+                         $"Neuron with specified Presynaptic Neuron Id of '{t.PresynapticNeuronId}' was not found."
                          );
                      return result;
                  });
+        }
 
         public IEnumerable<Neuron> GetPostsynapticNeurons(Guid neuronId)
         {
