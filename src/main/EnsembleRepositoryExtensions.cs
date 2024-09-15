@@ -40,8 +40,12 @@ namespace ei8.Cortex.Coding
             return origDict.ToDictionary(kvpK => keys.Single(t => keyConverter(t) == kvpK.Key), kvpE => kvpE.Value);
         }
 
-        public static async Task Uniquify(this IEnsembleRepository ensembleRepository, string userId,
-            Ensemble result)
+        public static async Task Uniquify(
+            this IEnsembleRepository ensembleRepository, 
+            string userId,
+            Ensemble result, 
+            IDictionary<string, Ensemble> cache = null
+        )
         {
             var currentNeuronIds = result.GetItems<Neuron>()
                 .Where(
@@ -94,11 +98,13 @@ namespace ei8.Cortex.Coding
                             $"'{string.Join(", ", postsynaptics.Select(n => n.Id))}'.");
                         var identical = await EnsembleRepositoryExtensions.GetPersistentIdentical(
                             ensembleRepository,
-                            postsynaptics,
-                            userId
+                            postsynaptics.Select(n => n.Id),
+                            currentNeuron.Tag,
+                            userId,
+                            cache
                         );
 
-                        if (identical.Item2 != null && currentNeuron.Tag == identical.Item2.Tag)
+                        if (identical != null)
                         {
                             Debug.WriteLine($"> Persistent identical granny found - updating presynaptics and containing ensemble.");
                             EnsembleRepositoryExtensions.UpdateDendrites(
@@ -173,42 +179,84 @@ namespace ei8.Cortex.Coding
 
         private static async Task<Tuple<Ensemble, Neuron>> GetPersistentIdentical(
             IEnsembleRepository ensembleRepository,
-            IEnumerable<Neuron> postsynaptics,
-            string userId
+            IEnumerable<Guid> currentPostsynapticIds,
+            string currentTag,
+            string userId,
+            IDictionary<string, Ensemble> cache = null
         )
         {
-            IEnumerable<string> postsIds = postsynaptics.Select(n => n.Id.ToString());
+            Tuple<Ensemble, Neuron> result = null;
 
-            var similarGrannyFromDb = (await ensembleRepository.GetByQueryAsync(
-                    userId,
-                    new Library.Common.NeuronQuery()
-                    {
-                        Postsynaptic = postsIds,
-                        DirectionValues = Library.Common.DirectionValues.Outbound,
-                        Depth = 1
-                    }
-                ));
-            var similarGrannyFromDbNeuron =
-                similarGrannyFromDb.GetItems<Neuron>()
-                .Where(n => !postsynaptics.Any(pn => pn.Id == n.Id));
+            var similarGrannyFromCacheOrDb = await EnsembleRepositoryExtensions.GetEnsembleFromCacheOrDB(
+                ensembleRepository,
+                userId,
+                cache,
+                currentTag,
+                currentPostsynapticIds
+            );
 
-            AssertionConcern.AssertStateTrue(
-                similarGrannyFromDbNeuron.Count() < 2,
-                    $"Redundant Neuron with postsynaptic Neurons '{string.Join(", ", postsIds)}' encountered."
-                );
-            if (similarGrannyFromDbNeuron.Any())
+            if (similarGrannyFromCacheOrDb != null)
             {
-                var resultTerminalCount = similarGrannyFromDb.GetTerminals(similarGrannyFromDbNeuron.Single().Id).Count();
+                var similarGrannyFromDbNeuron =
+                    similarGrannyFromCacheOrDb.GetItems<Neuron>()
+                    .Where(n => !currentPostsynapticIds.Any(pn => pn == n.Id));
+
                 AssertionConcern.AssertStateTrue(
-                    resultTerminalCount == postsynaptics.Count(),
-                    $"A correct identical match should have '{postsynaptics.Count()} terminals. Result has {resultTerminalCount}'."
+                    similarGrannyFromDbNeuron.Count() < 2,
+                        $"Redundant Neuron with postsynaptic Neurons '{string.Join(", ", currentPostsynapticIds)}' encountered."
+                    );
+                if (similarGrannyFromDbNeuron.Any())
+                {
+                    var resultTerminalCount = similarGrannyFromCacheOrDb.GetTerminals(similarGrannyFromDbNeuron.Single().Id).Count();
+                    AssertionConcern.AssertStateTrue(
+                        resultTerminalCount == currentPostsynapticIds.Count(),
+                        $"A correct identical match should have '{currentPostsynapticIds.Count()} terminals. Result has {resultTerminalCount}'."
+                    );
+                }
+
+                result = new Tuple<Ensemble, Neuron>(
+                    similarGrannyFromCacheOrDb,
+                    similarGrannyFromDbNeuron.SingleOrDefault()
                 );
             }
 
-            return new Tuple<Ensemble, Neuron>(
-                similarGrannyFromDb,
-                similarGrannyFromDbNeuron.SingleOrDefault()
+            return result;
+        }
+
+        private static async Task<Ensemble> GetEnsembleFromCacheOrDB(
+            IEnsembleRepository ensembleRepository, 
+            string userId, 
+            IDictionary<string, Ensemble> cache,
+            string currentTag,
+            IEnumerable<Guid> currentPostsynapticIds
+        )
+        {
+            string cacheId = currentTag + string.Join(string.Empty, currentPostsynapticIds.OrderBy(g => g));
+            if (cache == null || !cache.TryGetValue(cacheId, out Ensemble result))
+            {
+                var tempResult = await ensembleRepository.GetByQueryAsync(
+                    userId,
+                    new Library.Common.NeuronQuery()
+                    {
+                        Tag = !string.IsNullOrEmpty(currentTag) ? new string[] { currentTag } : null,
+                        Postsynaptic = currentPostsynapticIds.Select(pi => pi.ToString()),
+                        DirectionValues = Library.Common.DirectionValues.Outbound,
+                        Depth = 1
+                    }
                 );
+
+                if (tempResult.GetItems().Count() > 0)
+                {
+                    result = tempResult;
+
+                    if (cache != null)
+                        cache.Add(cacheId, result);
+                }
+                else
+                    result = null;
+            }
+
+            return result;
         }
     }
 }
