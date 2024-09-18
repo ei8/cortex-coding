@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using ei8.Cortex.Coding.Properties;
 
 namespace ei8.Cortex.Coding
 {

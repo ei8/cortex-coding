@@ -1,4 +1,6 @@
-﻿namespace ei8.Cortex.Coding
+﻿using ei8.Cortex.Coding.Properties.Neuron;
+
+namespace ei8.Cortex.Coding.Properties
 {
     public class PropertyData
     {

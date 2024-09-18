@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ei8.Cortex.Coding
+namespace ei8.Cortex.Coding.Properties
 {
     public class neurULConverterAttribute : Attribute
     {
