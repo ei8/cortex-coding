@@ -1,4 +1,5 @@
-﻿using neurUL.Common.Domain.Model;
+﻿using CQRSlite.Caching;
+using neurUL.Common.Domain.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,19 +11,21 @@ namespace ei8.Cortex.Coding
 {
     public static class EnsembleRepositoryExtensions
     {
-        public static async Task<Neuron> GetExternalReferenceAsync(this IEnsembleRepository ensembleRepository, string userId, string key) =>
-             (await ensembleRepository.GetExternalReferencesAsync(userId, key)).Values.SingleOrDefault();
+        public static async Task<Neuron> GetExternalReferenceAsync(this IEnsembleRepository ensembleRepository, string userId, string cortexLibraryOutBaseUrl, string key) =>
+             (await ensembleRepository.GetExternalReferencesAsync(userId, cortexLibraryOutBaseUrl, key)).Values.SingleOrDefault();
 
         public static async Task<Neuron> GetExternalReferenceAsync(
             this IEnsembleRepository ensembleRepository,
             string userId,
+            string cortexLibraryOutBaseUrl,
             object key
             ) =>
-            (await ensembleRepository.GetExternalReferencesAsync(userId, key)).Values.SingleOrDefault();
+            (await ensembleRepository.GetExternalReferencesAsync(userId, cortexLibraryOutBaseUrl, key)).Values.SingleOrDefault();
 
         public static async Task<IDictionary<object, Neuron>> GetExternalReferencesAsync(
             this IEnsembleRepository ensembleRepository,
             string userId,
+            string cortexLibraryOutBaseUrl,
             params object[] keys
             )
         {
@@ -36,23 +39,50 @@ namespace ei8.Cortex.Coding
 
                 return result;
             });
-            var origDict = await ensembleRepository.GetExternalReferencesAsync(userId, keys.Select(t => keyConverter(t)).ToArray());
+            var origDict = await ensembleRepository.GetExternalReferencesAsync(
+                userId, 
+                cortexLibraryOutBaseUrl, 
+                keys.Select(t => keyConverter(t)).ToArray()
+            );
             return origDict.ToDictionary(kvpK => keys.Single(t => keyConverter(t) == kvpK.Key), kvpE => kvpE.Value);
         }
 
-        public static async Task Uniquify(
+        public static async Task UniquifyAsync(
             this IEnsembleRepository ensembleRepository, 
-            string userId,
-            Ensemble result, 
+            string appUserId,
+            Ensemble ensemble,
+            string cortexLibraryOutBaseUrl, 
+            int queryResultLimit,
             IDictionary<string, Ensemble> cache = null
         )
         {
-            var currentNeuronIds = result.GetItems<Neuron>()
-                .Where(
-                    n =>
-                        n.IsTransient &&
-                        result.GetPostsynapticNeurons(n.Id).All(postn => !postn.IsTransient)
-                )
+            await EnsembleRepositoryExtensions.UniquifyNeuronsAsync(
+                ensembleRepository, 
+                appUserId, 
+                ensemble, 
+                cortexLibraryOutBaseUrl, 
+                queryResultLimit, 
+                cache
+            );
+            await EnsembleRepositoryExtensions.UniquifyTerminalsAsync(
+                ensembleRepository,
+                appUserId,
+                ensemble,
+                cortexLibraryOutBaseUrl
+            );           
+        }
+
+        private static async Task UniquifyNeuronsAsync(
+            IEnsembleRepository ensembleRepository, 
+            string appUserId, 
+            Ensemble ensemble, 
+            string cortexLibraryOutBaseUrl, 
+            int queryResultLimit, 
+            IDictionary<string, Ensemble> cache
+        )
+        {
+            var currentNeuronIds = ensemble.GetItems<Neuron>()
+                .Where(n => EnsembleRepositoryExtensions.IsTransientNeuronWithPersistentPostsynaptics(ensemble, n))
                 .Select(n => n.Id);
             var nextNeuronIds = new List<Guid>();
             var processedNeuronIds = new List<Guid>();
@@ -71,13 +101,13 @@ namespace ei8.Cortex.Coding
                     }
 
                     AssertionConcern.AssertStateTrue(
-                        result.TryGetById(currentNeuronId, out Neuron currentNeuron),
+                        ensemble.TryGetById(currentNeuronId, out Neuron currentNeuron),
                         $"'currentNeuron' '{currentNeuronId}' must exist in ensemble."
                     );
 
                     Debug.WriteLine($"Tag: '{currentNeuron.Tag}'");
 
-                    var postsynaptics = result.GetPostsynapticNeurons(currentNeuronId);
+                    var postsynaptics = ensemble.GetPostsynapticNeurons(currentNeuronId);
                     if (EnsembleRepositoryExtensions.ContainsTransientUnprocessed(postsynaptics, processedNeuronIds))
                     {
                         Debug.WriteLine($"> Transient unprocessed postsynaptic found - processing deferred.");
@@ -100,7 +130,9 @@ namespace ei8.Cortex.Coding
                             ensembleRepository,
                             postsynaptics.Select(n => n.Id),
                             currentNeuron.Tag,
-                            userId,
+                            appUserId,
+                            cortexLibraryOutBaseUrl,
+                            queryResultLimit,
                             cache
                         );
 
@@ -108,16 +140,16 @@ namespace ei8.Cortex.Coding
                         {
                             Debug.WriteLine($"> Persistent identical granny found - updating presynaptics and containing ensemble.");
                             EnsembleRepositoryExtensions.UpdateDendrites(
-                                result,
+                                ensemble,
                                 currentNeuronId,
                                 identical.Item2.Id
                             );
                             EnsembleRepositoryExtensions.RemoveTerminals(
-                                result,
+                                ensemble,
                                 currentNeuronId
                             );
-                            result.AddReplaceItems(identical.Item1);
-                            result.Remove(currentNeuronId);
+                            ensemble.AddReplaceItems(identical.Item1);
+                            ensemble.Remove(currentNeuronId);
                             removedNeuronIds.Add(currentNeuronId);
                             Debug.WriteLine($"> Neuron replaced and removed.");
                             nextPostsynapticId = identical.Item2.Id;
@@ -135,7 +167,7 @@ namespace ei8.Cortex.Coding
                     }
 
                     processedNeuronIds.Add(nextPostsynapticId);
-                    var presynaptics = result.GetPresynapticNeurons(nextPostsynapticId);
+                    var presynaptics = ensemble.GetPresynapticNeurons(nextPostsynapticId);
                     presynaptics.ToList().ForEach(n =>
                     {
                         Debug.WriteLine($"> Adding presynaptic '{n.Id}' to nextNeuronIds.");
@@ -146,6 +178,70 @@ namespace ei8.Cortex.Coding
                 currentNeuronIds = nextNeuronIds.ToArray();
             }
         }
+
+        private static async Task UniquifyTerminalsAsync(
+            IEnsembleRepository ensembleRepository,
+            string appUserId,
+            Ensemble ensemble,
+            string cortexLibraryOutBaseUrl
+        )
+        {
+            var terminalIds = ensemble.GetItems<Terminal>()
+                .Where(t => IsTransientTerminalLinkingPersistentNeurons(ensemble, t))
+                .Select(t => t.Id);
+
+            foreach(var tId in terminalIds)
+            {
+                if(
+                    ensemble.TryGetById(tId, out Terminal currentTerminal) &&
+                    await EnsembleRepositoryExtensions.HasPersistentIdentical(
+                        ensembleRepository,
+                        currentTerminal.PresynapticNeuronId,
+                        currentTerminal.PostsynapticNeuronId,
+                        appUserId,
+                        cortexLibraryOutBaseUrl
+                    )
+                )
+                ensemble.Remove(tId);
+            }
+        }
+
+        private static async Task<bool> HasPersistentIdentical(
+            IEnsembleRepository ensembleRepository, 
+            Guid presynapticNeuronId, 
+            Guid postsynapticNeuronId, 
+            string appUserId, 
+            string cortexLibraryOutBaseUrl
+        )
+        {
+            var queryResult = await ensembleRepository.GetByQueryAsync(
+                    appUserId,
+                    new Library.Common.NeuronQuery()
+                    {
+                        Id = new string[] { presynapticNeuronId.ToString() },
+                        Postsynaptic = new string[] { postsynapticNeuronId.ToString() },
+                        // TODO: how should this be handled
+                        NeuronActiveValues = Library.Common.ActiveValues.All,
+                        TerminalActiveValues = Library.Common.ActiveValues.All
+                    },
+                    cortexLibraryOutBaseUrl,
+                    int.MaxValue
+                );
+
+            return queryResult.GetItems<Neuron>().Any();
+        }
+
+        private static bool IsTransientTerminalLinkingPersistentNeurons(Ensemble ensemble, Terminal t)
+        {
+            return t.IsTransient &&
+                ensemble.TryGetById(t.PresynapticNeuronId, out Neuron pre) &&
+                ensemble.TryGetById(t.PostsynapticNeuronId, out Neuron post) &&
+                !pre.IsTransient &&
+                !post.IsTransient;
+        }
+
+        private static bool IsTransientNeuronWithPersistentPostsynaptics(Ensemble ensemble, Neuron neuron) =>
+            neuron.IsTransient && ensemble.GetPostsynapticNeurons(neuron.Id).All(postn => !postn.IsTransient);
 
         private static void UpdateDendrites(Ensemble result, Guid oldPostsynapticId, Guid newPostsynapticId)
         {
@@ -181,7 +277,9 @@ namespace ei8.Cortex.Coding
             IEnsembleRepository ensembleRepository,
             IEnumerable<Guid> currentPostsynapticIds,
             string currentTag,
-            string userId,
+            string appUserId,
+            string cortexLibraryOutBaseUrl, 
+            int queryResultLimit,
             IDictionary<string, Ensemble> cache = null
         )
         {
@@ -189,10 +287,12 @@ namespace ei8.Cortex.Coding
 
             var similarGrannyFromCacheOrDb = await EnsembleRepositoryExtensions.GetEnsembleFromCacheOrDB(
                 ensembleRepository,
-                userId,
+                appUserId,
                 cache,
                 currentTag,
-                currentPostsynapticIds
+                currentPostsynapticIds,
+                cortexLibraryOutBaseUrl,
+                queryResultLimit
             );
 
             if (similarGrannyFromCacheOrDb != null)
@@ -225,24 +325,28 @@ namespace ei8.Cortex.Coding
 
         private static async Task<Ensemble> GetEnsembleFromCacheOrDB(
             IEnsembleRepository ensembleRepository, 
-            string userId, 
+            string appUserId, 
             IDictionary<string, Ensemble> cache,
             string currentTag,
-            IEnumerable<Guid> currentPostsynapticIds
+            IEnumerable<Guid> currentPostsynapticIds, 
+            string cortexLibraryOutBaseUrl, 
+            int queryResultLimit
         )
         {
             string cacheId = currentTag + string.Join(string.Empty, currentPostsynapticIds.OrderBy(g => g));
             if (cache == null || !cache.TryGetValue(cacheId, out Ensemble result))
             {
                 var tempResult = await ensembleRepository.GetByQueryAsync(
-                    userId,
+                    appUserId,
                     new Library.Common.NeuronQuery()
                     {
                         Tag = !string.IsNullOrEmpty(currentTag) ? new string[] { currentTag } : null,
                         Postsynaptic = currentPostsynapticIds.Select(pi => pi.ToString()),
                         DirectionValues = Library.Common.DirectionValues.Outbound,
                         Depth = 1
-                    }
+                    },
+                    cortexLibraryOutBaseUrl,
+                    queryResultLimit
                 );
 
                 if (tempResult.GetItems().Count() > 0)

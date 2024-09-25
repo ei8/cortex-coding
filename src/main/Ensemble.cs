@@ -123,6 +123,8 @@ namespace ei8.Cortex.Coding
                  });
         }
 
+        public bool AnyTransient() => this.itemsDictionary.Values.Any(i => i.IsTransient);
+
         // TODO: enable if needed by client code
         // public IDictionary<T, Neuron> GetInterneurons<T>(
         //    Neuron presynaptic, 
