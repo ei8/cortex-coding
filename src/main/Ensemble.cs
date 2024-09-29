@@ -57,12 +57,12 @@ namespace ei8.Cortex.Coding
             itemsDictionary.Add(item.Id, item);
         }
 
-        public TEnsembleItem Obtain<TEnsembleItem>(TEnsembleItem value, bool forceReplace = false)
+        public TEnsembleItem AddOrGetIfExists<TEnsembleItem>(TEnsembleItem value, bool replaceIfExists = false)
             where TEnsembleItem : IEnsembleItem
         {
             TEnsembleItem result = default;
             // if not found in ensemble
-            if (!this.TryGetById(value.Id, out result) || forceReplace)
+            if (!this.TryGetById(value.Id, out result) || replaceIfExists)
             {
                 this.AddReplace(value);
                 result = value;

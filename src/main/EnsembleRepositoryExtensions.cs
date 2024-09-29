@@ -32,8 +32,8 @@ namespace ei8.Cortex.Coding
             var keyConverter = new Func<object, string>(o =>
             {
                 var result = o as string;
-                if (o is Type)
-                    result = ExternalReference.ToKeyString((Type)o);
+                if (o is MemberInfo)
+                    result = ExternalReference.ToKeyString((MemberInfo)o);
                 else if (o is Enum)
                     result = ExternalReference.ToKeyString((Enum)o);
 
