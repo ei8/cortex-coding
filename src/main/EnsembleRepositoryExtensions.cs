@@ -11,21 +11,19 @@ namespace ei8.Cortex.Coding
 {
     public static class EnsembleRepositoryExtensions
     {
-        public static async Task<Neuron> GetExternalReferenceAsync(this IEnsembleRepository ensembleRepository, string userId, string cortexLibraryOutBaseUrl, string key) =>
-             (await ensembleRepository.GetExternalReferencesAsync(userId, cortexLibraryOutBaseUrl, key)).Values.SingleOrDefault();
+        public static async Task<Neuron> GetExternalReferenceAsync(this IEnsembleRepository ensembleRepository, string userId, string key) =>
+             (await ensembleRepository.GetExternalReferencesAsync(userId, key)).Values.SingleOrDefault();
 
         public static async Task<Neuron> GetExternalReferenceAsync(
             this IEnsembleRepository ensembleRepository,
             string userId,
-            string cortexLibraryOutBaseUrl,
             object key
             ) =>
-            (await ensembleRepository.GetExternalReferencesAsync(userId, cortexLibraryOutBaseUrl, key)).Values.SingleOrDefault();
+            (await ensembleRepository.GetExternalReferencesAsync(userId, key)).Values.SingleOrDefault();
 
         public static async Task<IDictionary<object, Neuron>> GetExternalReferencesAsync(
             this IEnsembleRepository ensembleRepository,
             string userId,
-            string cortexLibraryOutBaseUrl,
             params object[] keys
             )
         {
@@ -41,7 +39,6 @@ namespace ei8.Cortex.Coding
             });
             var origDict = await ensembleRepository.GetExternalReferencesAsync(
                 userId, 
-                cortexLibraryOutBaseUrl, 
                 keys.Select(t => keyConverter(t)).ToArray()
             );
             return origDict.ToDictionary(kvpK => keys.Single(t => keyConverter(t) == kvpK.Key), kvpE => kvpE.Value);
@@ -51,8 +48,6 @@ namespace ei8.Cortex.Coding
             this IEnsembleRepository ensembleRepository, 
             string appUserId,
             Ensemble ensemble,
-            string cortexLibraryOutBaseUrl, 
-            int queryResultLimit,
             IDictionary<string, Ensemble> cache = null
         )
         {
@@ -60,15 +55,12 @@ namespace ei8.Cortex.Coding
                 ensembleRepository, 
                 appUserId, 
                 ensemble, 
-                cortexLibraryOutBaseUrl, 
-                queryResultLimit, 
                 cache
             );
             await EnsembleRepositoryExtensions.UniquifyTerminalsAsync(
                 ensembleRepository,
                 appUserId,
-                ensemble,
-                cortexLibraryOutBaseUrl
+                ensemble
             );           
         }
 
@@ -76,8 +68,6 @@ namespace ei8.Cortex.Coding
             IEnsembleRepository ensembleRepository, 
             string appUserId, 
             Ensemble ensemble, 
-            string cortexLibraryOutBaseUrl, 
-            int queryResultLimit, 
             IDictionary<string, Ensemble> cache
         )
         {
@@ -131,8 +121,6 @@ namespace ei8.Cortex.Coding
                             postsynaptics.Select(n => n.Id),
                             currentNeuron.Tag,
                             appUserId,
-                            cortexLibraryOutBaseUrl,
-                            queryResultLimit,
                             cache
                         );
 
@@ -182,8 +170,7 @@ namespace ei8.Cortex.Coding
         private static async Task UniquifyTerminalsAsync(
             IEnsembleRepository ensembleRepository,
             string appUserId,
-            Ensemble ensemble,
-            string cortexLibraryOutBaseUrl
+            Ensemble ensemble
         )
         {
             var terminalIds = ensemble.GetItems<Terminal>()
@@ -198,8 +185,7 @@ namespace ei8.Cortex.Coding
                         ensembleRepository,
                         currentTerminal.PresynapticNeuronId,
                         currentTerminal.PostsynapticNeuronId,
-                        appUserId,
-                        cortexLibraryOutBaseUrl
+                        appUserId
                     )
                 )
                 ensemble.Remove(tId);
@@ -210,8 +196,7 @@ namespace ei8.Cortex.Coding
             IEnsembleRepository ensembleRepository, 
             Guid presynapticNeuronId, 
             Guid postsynapticNeuronId, 
-            string appUserId, 
-            string cortexLibraryOutBaseUrl
+            string appUserId
         )
         {
             var queryResult = await ensembleRepository.GetByQueryAsync(
@@ -224,7 +209,6 @@ namespace ei8.Cortex.Coding
                         NeuronActiveValues = Library.Common.ActiveValues.All,
                         TerminalActiveValues = Library.Common.ActiveValues.All
                     },
-                    cortexLibraryOutBaseUrl,
                     int.MaxValue
                 );
 
@@ -278,8 +262,6 @@ namespace ei8.Cortex.Coding
             IEnumerable<Guid> currentPostsynapticIds,
             string currentTag,
             string appUserId,
-            string cortexLibraryOutBaseUrl, 
-            int queryResultLimit,
             IDictionary<string, Ensemble> cache = null
         )
         {
@@ -290,9 +272,7 @@ namespace ei8.Cortex.Coding
                 appUserId,
                 cache,
                 currentTag,
-                currentPostsynapticIds,
-                cortexLibraryOutBaseUrl,
-                queryResultLimit
+                currentPostsynapticIds
             );
 
             if (similarGrannyFromCacheOrDb != null)
@@ -328,9 +308,7 @@ namespace ei8.Cortex.Coding
             string appUserId, 
             IDictionary<string, Ensemble> cache,
             string currentTag,
-            IEnumerable<Guid> currentPostsynapticIds, 
-            string cortexLibraryOutBaseUrl, 
-            int queryResultLimit
+            IEnumerable<Guid> currentPostsynapticIds
         )
         {
             string cacheId = currentTag + string.Join(string.Empty, currentPostsynapticIds.OrderBy(g => g));
@@ -344,9 +322,7 @@ namespace ei8.Cortex.Coding
                         Postsynaptic = currentPostsynapticIds.Select(pi => pi.ToString()),
                         DirectionValues = Library.Common.DirectionValues.Outbound,
                         Depth = 1
-                    },
-                    cortexLibraryOutBaseUrl,
-                    queryResultLimit
+                    }
                 );
 
                 if (tempResult.GetItems().Count() > 0)
