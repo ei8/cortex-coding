@@ -6,8 +6,16 @@ namespace ei8.Cortex.Coding
 {
     public interface IEnsembleRepository
     {
-        Task<IDictionary<string, Neuron>> GetExternalReferencesAsync(string userId, params string[] keys);
+        Task<IDictionary<string, Neuron>> GetExternalReferencesAsync(IEnumerable<string> keys);
 
-        Task<Ensemble> GetByQueryAsync(string userId, NeuronQuery query, int? queryResultLimitOverride = null);
+        Task<IDictionary<string, Neuron>> GetExternalReferencesAsync(IEnumerable<string> keys, string userId);
+
+        Task<Ensemble> GetByQueryAsync(NeuronQuery query);
+
+        Task<Ensemble> GetByQueryAsync(NeuronQuery query, bool restrictQueryResultCount);
+
+        Task<Ensemble> GetByQueryAsync(NeuronQuery query, string userId);
+
+        Task<Ensemble> GetByQueryAsync(NeuronQuery query, string userId, bool restrictQueryResultCount);
     }
 }

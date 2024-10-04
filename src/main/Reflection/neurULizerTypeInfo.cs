@@ -1,11 +1,7 @@
 ﻿using ei8.Cortex.Coding.Properties;
 using ei8.Cortex.Coding.Properties.Neuron;
-using Newtonsoft.Json.Linq;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 
 namespace ei8.Cortex.Coding.Reflection
 {
