@@ -197,7 +197,7 @@ namespace ei8.Cortex.Coding
                     false
                 );
 
-            return queryResult.GetItems<Neuron>().Any();
+            return queryResult.Ensemble.GetItems<Neuron>().Any();
         }
 
         private static bool IsTransientTerminalLinkingPersistentNeurons(Ensemble ensemble, Terminal t)
@@ -306,9 +306,9 @@ namespace ei8.Cortex.Coding
                     }
                 );
 
-                if (tempResult.GetItems().Count() > 0)
+                if (tempResult.Ensemble.GetItems().Count() > 0)
                 {
-                    result = tempResult;
+                    result = tempResult.Ensemble;
 
                     if (cache != null)
                         cache.Add(cacheId, result);
