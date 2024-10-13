@@ -37,17 +37,27 @@ namespace ei8.Cortex.Coding.Reflection
                         null;
                     string propertyKey = ExternalReference.ToKeyString(property);
 
+                    // if classAttribute was specified
+                    var classKey = string.Empty;
+
+                    if (classAttribute != null)
+                    {
+                        if (classAttribute.Type != null)
+                            // use classAttribute type
+                            classKey = ExternalReference.ToKeyString(classAttribute.Type);
+                        else
+                            classKey = string.Empty;
+                    }
+                    else
+                        // otherwise, use property type
+                        classKey = ExternalReference.ToKeyString(property.PropertyType);
+
                     result = new PropertyData(
                         propertyKey,
-                        // if classAttribute was specified
-                        classAttribute?.Type != null ?
-                            // use classAttribute type
-                            ExternalReference.ToKeyString(classAttribute.Type) :
-                            // otherwise, use property type
-                            ExternalReference.ToKeyString(property.PropertyType),
+                        classKey,
                         propertyValue,
                         matchBy
-                        );
+                    );
                 }
             }
 

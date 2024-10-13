@@ -84,8 +84,8 @@ namespace ei8.Cortex.Coding
         {
             var commonItemsInNewDictionary = ensemble.itemsDictionary.Where(item => itemsDictionary.ContainsKey(item.Key)).ToList();
             // validate all common items in specified ensemble
-            commonItemsInNewDictionary.ForEach(ci => ValidateItemReplacementType(ci.Value, itemsDictionary[ci.Key]));
-            ensemble.itemsDictionary.ToList().ForEach(ni => AddReplaceCore(ni.Value, itemsDictionary, commonItemsInNewDictionary.Contains(ni)));
+            commonItemsInNewDictionary.ForEach(ci => Ensemble.ValidateItemReplacementType(ci.Value, itemsDictionary[ci.Key]));
+            ensemble.itemsDictionary.ToList().ForEach(ni => Ensemble.AddReplaceCore(ni.Value, itemsDictionary, commonItemsInNewDictionary.Contains(ni)));
         }
 
         public void Remove(Guid id) => this.itemsDictionary.Remove(id);

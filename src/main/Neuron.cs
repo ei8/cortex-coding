@@ -53,6 +53,22 @@ namespace ei8.Cortex.Coding
             Guid? regionId
             ) => new Neuron(id, true, tag, externalReferenceUrl, regionId);
 
+        public static Neuron CloneAsPersistent(Neuron original) => new Neuron(
+            original.Id,
+            original.Tag,
+            original.ExternalReferenceUrl,
+            original.RegionId,
+            original.RegionTag,
+            original.CreationTimestamp,
+            original.CreationAuthorId,
+            original.CreationAuthorTag,
+            original.UnifiedLastModificationTimestamp,
+            original.UnifiedLastModificationAuthorId,
+            original.UnifiedLastModificationAuthorTag,
+            original.Url,
+            original.Version
+        );
+
         public bool IsTransient { get; }
         
         public Guid Id { get; private set; }

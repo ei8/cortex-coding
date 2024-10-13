@@ -2,7 +2,7 @@
 
 namespace ei8.Cortex.Coding.Properties
 {
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Class, AllowMultiple = false)]
     public class neurULKeyAttribute : Attribute
     {
         public neurULKeyAttribute(string key)

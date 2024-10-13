@@ -1,6 +1,6 @@
 ﻿using ei8.Cortex.Coding.Reflection;
+using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding
 {
@@ -18,7 +18,7 @@ namespace ei8.Cortex.Coding
         Ensemble neurULize<TValue>(
             TValue value, 
             neurULizerTypeInfo typeInfo,
-            IDictionary<string, Coding.Neuron> idPropertyValueNeurons,
+            IDictionary<Guid, Coding.Neuron> idPropertyValueNeurons,
             IDictionary<string, Coding.Neuron> externalReferences            
         )
             where TValue : class;
