@@ -18,7 +18,11 @@ namespace ei8.Cortex.Coding
             Strength = strength;
         }
 
-        public static Terminal CreateTransient(Guid presynapticNeuronId, Guid postsynapticNeuronId) => new Terminal(Guid.NewGuid(), true, presynapticNeuronId, postsynapticNeuronId, NeurotransmitterEffect.Excite, 1f);
+        public static Terminal CreateTransient(Guid presynapticNeuronId, Guid postsynapticNeuronId) => 
+            new Terminal(Guid.NewGuid(), true, presynapticNeuronId, postsynapticNeuronId, NeurotransmitterEffect.Excite, 1f);
+
+        public static Terminal CloneAsPersistent(Terminal value) =>
+            new Terminal(value.Id, value.PresynapticNeuronId, value.PostsynapticNeuronId, value.Effect, value.Strength);
 
         public Guid Id { get; private set; }
         public bool IsTransient { get; }
