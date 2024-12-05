@@ -4,7 +4,19 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>ei8.Cortex.Coding</AssemblyName>
     <RootNamespace>ei8.Cortex.Coding</RootNamespace>
+    <PackageId>ei8.Cortex.Coding</PackageId>
+    <PackageVersion>0.0.6</PackageVersion>
+    <Authors>Elmer Roderick Niem Bool</Authors>
+    <Description>Cortex Coding</Description>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageReleaseNotes>Initial commit.</PackageReleaseNotes>
+    <PackageTags>cortex coding</PackageTags>
+    <Version>0.0.6</Version>
+    <PackageLicenseUrl>https://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" />
 
   <ItemGroup>
     <PackageReference Include="ei8.Cortex.Library.Common" Version="0.3.11" />

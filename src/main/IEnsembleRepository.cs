@@ -5,9 +5,7 @@ using System.Threading.Tasks;
 namespace ei8.Cortex.Coding
 {
     public interface IEnsembleRepository
-    {
-        Task<IDictionary<string, Neuron>> GetExternalReferencesAsync(IEnumerable<string> keys);
-
+    { 
         Task<QueryResult> GetByQueryAsync(NeuronQuery query);
 
         Task<QueryResult> GetByQueryAsync(NeuronQuery query, bool restrictQueryResultCount);
