@@ -1,10 +1,9 @@
 ﻿using ei8.Cortex.Library.Common;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ei8.Cortex.Coding
 {
-    public interface IEnsembleRepository
+    public interface INetworkRepository
     { 
         Task<QueryResult> GetByQueryAsync(NeuronQuery query);
 

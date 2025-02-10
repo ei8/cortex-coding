@@ -5,27 +5,27 @@ using System.Linq;
 
 namespace ei8.Cortex.Coding
 {
-    public class Ensemble
+    public class Network
     {
-        private readonly IDictionary<Guid, IEnsembleItem> itemsDictionary;
+        private readonly IDictionary<Guid, INetworkItem> itemsDictionary;
 
-        public Ensemble() : this(new Dictionary<Guid, IEnsembleItem>())
+        public Network() : this(new Dictionary<Guid, INetworkItem>())
         {
         }
 
-        public Ensemble(IDictionary<Guid, IEnsembleItem> itemsDictionary) =>
+        public Network(IDictionary<Guid, INetworkItem> itemsDictionary) =>
             this.itemsDictionary = itemsDictionary;
 
         public bool TryGetById<T>(
                 Guid id,
                 out T result
             )
-            where T : IEnsembleItem
+            where T : INetworkItem
         {
             bool bResult = false;
             result = default;
 
-            if (itemsDictionary.TryGetValue(id, out IEnsembleItem tryResult))
+            if (itemsDictionary.TryGetValue(id, out INetworkItem tryResult))
             {
                 result = (T)tryResult;
                 bResult = true;
@@ -34,22 +34,22 @@ namespace ei8.Cortex.Coding
             return bResult;
         }
 
-        public IEnumerable<IEnsembleItem> GetItems() => this.GetItems<IEnsembleItem>();
+        public IEnumerable<INetworkItem> GetItems() => this.GetItems<INetworkItem>();
 
         public IEnumerable<T> GetItems<T>()
-            where T : IEnsembleItem
+            where T : INetworkItem
             => itemsDictionary.Values.OfType<T>();
 
-        public void AddReplace(IEnsembleItem item)
+        public void AddReplace(INetworkItem item)
         {
-            bool replacing = this.itemsDictionary.TryGetValue(item.Id, out IEnsembleItem oldItem);
+            bool replacing = this.itemsDictionary.TryGetValue(item.Id, out INetworkItem oldItem);
             if (replacing)
-                Ensemble.ValidateItemReplacementType(item, oldItem);
+                Network.ValidateItemReplacementType(item, oldItem);
 
-            Ensemble.AddReplaceCore(item, this.itemsDictionary, replacing);
+            Network.AddReplaceCore(item, this.itemsDictionary, replacing);
         }
 
-        private static void AddReplaceCore(IEnsembleItem item, IDictionary<Guid, IEnsembleItem> itemsDictionary, bool replacing)
+        private static void AddReplaceCore(INetworkItem item, IDictionary<Guid, INetworkItem> itemsDictionary, bool replacing)
         {
             if (replacing)
                 itemsDictionary.Remove(item.Id);
@@ -57,11 +57,11 @@ namespace ei8.Cortex.Coding
             itemsDictionary.Add(item.Id, item);
         }
 
-        public TEnsembleItem AddOrGetIfExists<TEnsembleItem>(TEnsembleItem value, bool replaceIfExists = false)
-            where TEnsembleItem : IEnsembleItem
+        public TNetworkItem AddOrGetIfExists<TNetworkItem>(TNetworkItem value, bool replaceIfExists = false)
+            where TNetworkItem : INetworkItem
         {
-            TEnsembleItem result = default;
-            // if not found in ensemble
+            TNetworkItem result;
+            // if not found in network
             if (!this.TryGetById(value.Id, out result) || replaceIfExists)
             {
                 this.AddReplace(value);
@@ -70,7 +70,7 @@ namespace ei8.Cortex.Coding
             return result;
         }
 
-        private static void ValidateItemReplacementType(IEnsembleItem newItem, IEnsembleItem oldItem)
+        private static void ValidateItemReplacementType(INetworkItem newItem, INetworkItem oldItem)
         {
             AssertionConcern.AssertArgumentValid(
                 t => t.GetType() == oldItem.GetType(),
@@ -80,12 +80,12 @@ namespace ei8.Cortex.Coding
                 );
         }
 
-        public void AddReplaceItems(Ensemble ensemble)
+        public void AddReplaceItems(Network network)
         {
-            var commonItemsInNewDictionary = ensemble.itemsDictionary.Where(item => itemsDictionary.ContainsKey(item.Key)).ToList();
-            // validate all common items in specified ensemble
-            commonItemsInNewDictionary.ForEach(ci => Ensemble.ValidateItemReplacementType(ci.Value, itemsDictionary[ci.Key]));
-            ensemble.itemsDictionary.ToList().ForEach(ni => Ensemble.AddReplaceCore(ni.Value, itemsDictionary, commonItemsInNewDictionary.Contains(ni)));
+            var commonItemsInNewDictionary = network.itemsDictionary.Where(item => itemsDictionary.ContainsKey(item.Key)).ToList();
+            // validate all common items in specified network
+            commonItemsInNewDictionary.ForEach(ci => Network.ValidateItemReplacementType(ci.Value, itemsDictionary[ci.Key]));
+            network.itemsDictionary.ToList().ForEach(ni => Network.AddReplaceCore(ni.Value, itemsDictionary, commonItemsInNewDictionary.Contains(ni)));
         }
 
         public void Remove(Guid id) => this.itemsDictionary.Remove(id);

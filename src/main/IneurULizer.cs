@@ -15,7 +15,7 @@ namespace ei8.Cortex.Coding
         /// <param name="idPropertyValueNeurons"></param>
         /// <param name="externalReferences"></param>
         /// <returns></returns>
-        Ensemble neurULize<TValue>(
+        Network neurULize<TValue>(
             TValue value, 
             neurULizerTypeInfo typeInfo,
             IDictionary<Guid, Coding.Neuron> idPropertyValueNeurons,
@@ -33,7 +33,7 @@ namespace ei8.Cortex.Coding
         /// <param name="externalReferences"></param>
         /// <returns></returns>
         IEnumerable<TValue> DeneurULize<TValue>(
-            Ensemble value, 
+            Network value, 
             IEnumerable<Neuron> instanceNeurons,
             neurULizerTypeInfo typeInfo,
             IDictionary<string, Coding.Neuron> externalReferences

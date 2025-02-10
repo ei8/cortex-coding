@@ -6,7 +6,7 @@ namespace ei8.Cortex.Coding
 {
     public static class LibraryExtensions
     {
-        public static Ensemble ToEnsemble(this Library.Common.QueryResult<Library.Common.Neuron> queryResult)
+        public static Network ToNetwork(this Library.Common.QueryResult<Library.Common.Neuron> queryResult)
         {
             var allNs = queryResult.Items;
             allNs = allNs.Concat(queryResult.Items.SelectMany(n => n.Traversals.SelectMany(t => t.Neurons)));
@@ -14,38 +14,38 @@ namespace ei8.Cortex.Coding
 
             var eNs = allNs.GroupBy(n => n.Id)
                 .Select(g => g.First())
-                .Select(n => n.ToEnsemble());
+                .Select(n => n.ToNetwork());
             var eTs = allTs.GroupBy(t => t.Id)
                 .Select(g => g.First())
-                .Select(t => t.ToEnsemble());
+                .Select(t => t.ToNetwork());
 
-            return new Ensemble(
-                eNs.Cast<IEnsembleItem>().Concat(
-                    eTs.Cast<IEnsembleItem>()
+            return new Network(
+                eNs.Cast<INetworkItem>().Concat(
+                    eTs.Cast<INetworkItem>()
                 ).ToDictionary(ei => ei.Id)
             );
         }
 
-        public static Ensemble ToEnsemble(this IEnumerable<Library.Common.QueryResult<Library.Common.Neuron>> queryResults)
+        public static Network ToNetwork(this IEnumerable<Library.Common.QueryResult<Library.Common.Neuron>> queryResults)
         {
             var allNs = queryResults.SelectMany(qr => qr.Items.SelectMany(n => n.Traversals.SelectMany(t => t.Neurons)));
             var allTs = queryResults.SelectMany(qr => qr.Items.SelectMany(n => n.Traversals.SelectMany(t => t.Terminals)));
 
             var eNs = allNs.GroupBy(n => n.Id)
                 .Select(g => g.First())
-                .Select(n => n.ToEnsemble());
+                .Select(n => n.ToNetwork());
             var eTs = allTs.GroupBy(t => t.Id)
                 .Select(g => g.First())
-                .Select(t => t.ToEnsemble());
+                .Select(t => t.ToNetwork());
 
-            return new Ensemble(
-                eNs.Cast<IEnsembleItem>().Concat(
-                    eTs.Cast<IEnsembleItem>()
+            return new Network(
+                eNs.Cast<INetworkItem>().Concat(
+                    eTs.Cast<INetworkItem>()
                 ).ToDictionary(ei => ei.Id)
             );
         }
 
-        public static Neuron ToEnsemble(
+        public static Neuron ToNetwork(
             this Library.Common.Neuron value
             ) => new Neuron(
                 Guid.Parse(value.Id),
@@ -63,7 +63,7 @@ namespace ei8.Cortex.Coding
                 value.Version
             );
 
-        public static Terminal ToEnsemble(
+        public static Terminal ToNetwork(
             this Library.Common.Terminal value
         )
         {

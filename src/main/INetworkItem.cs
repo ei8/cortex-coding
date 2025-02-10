@@ -2,7 +2,7 @@
 
 namespace ei8.Cortex.Coding
 {
-    public interface IEnsembleItem
+    public interface INetworkItem
     {
         Guid Id { get; }
 

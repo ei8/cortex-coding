@@ -2,7 +2,7 @@
 
 namespace ei8.Cortex.Coding
 {
-    public class Terminal : IEnsembleItem
+    public class Terminal : INetworkItem
     {
         public Terminal(Guid id, Guid presynapticNeuronId, Guid postsynapticNeuronId, NeurotransmitterEffect effect, float strength) : this(id, false, presynapticNeuronId, postsynapticNeuronId, effect, strength)
         {

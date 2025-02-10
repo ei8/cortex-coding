@@ -4,13 +4,13 @@ namespace ei8.Cortex.Coding
 {
     public class QueryResult
     {
-        public QueryResult(Ensemble ensemble, Guid userNeuronId)
+        public QueryResult(Network network, Guid userNeuronId)
         {
-            this.Ensemble = ensemble;
+            this.Network = network;
             this.UserNeuronId = userNeuronId;
         }
 
-        public Ensemble Ensemble { get; set; }
+        public Network Network { get; set; }
 
         public Guid UserNeuronId { get; set; }
     }

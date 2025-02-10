@@ -2,7 +2,7 @@
 
 namespace ei8.Cortex.Coding
 {
-    public class Neuron : IEnsembleItem
+    public class Neuron : INetworkItem
     {
         public Neuron(
             Guid id, 
