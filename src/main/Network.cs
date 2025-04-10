@@ -125,6 +125,21 @@ namespace ei8.Cortex.Coding
 
         public bool AnyTransient() => this.itemsDictionary.Values.Any(i => i.IsTransient);
 
+        public bool TryGetByTag(string tag, out IEnumerable<Neuron> result)
+        {
+            bool result2 = false;
+            result = null;
+            var matches = this.GetItems<Neuron>().Where(n => n.Tag == tag);
+
+            if (matches.Any())
+            {
+                result = matches;
+                result2 = true;
+            }
+
+            return result2;
+        }
+
         // TODO: enable if needed by client code
         // public IDictionary<T, Neuron> GetInterneurons<T>(
         //    Neuron presynaptic, 
