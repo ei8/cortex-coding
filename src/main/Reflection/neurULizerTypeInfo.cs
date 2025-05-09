@@ -23,7 +23,7 @@ namespace ei8.Cortex.Coding.Reflection
         public IEnumerable<PropertyData> GrannyProperties { get; private set; }
 
         public IEnumerable<string> Keys =>
-            new string[] {
+            new[] {
                 this.ValueClassKey
             }.Concat(
                 this.GrannyPropertiesKeys
