@@ -1,7 +1,6 @@
 ﻿using ei8.Cortex.Coding.Properties;
 using ei8.Cortex.Coding.Properties.Neuron;
 using ei8.Cortex.Coding.Wrappers;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -12,8 +11,8 @@ namespace ei8.Cortex.Coding.Reflection
         private neurULizerTypeInfo()
         {
             this.ValueClassKey = string.Empty;
-            this.NeuronProperties = Array.Empty<INeuronProperty>();
-            this.GrannyProperties = Array.Empty<PropertyData>();
+            this.NeuronProperties = Enumerable.Empty<INeuronProperty>();
+            this.GrannyProperties = Enumerable.Empty<PropertyData>();
         }
 
         public string ValueClassKey { get; private set; }
@@ -34,14 +33,14 @@ namespace ei8.Cortex.Coding.Reflection
                 .Concat(this.GrannyProperties.Select(gp => gp.ClassKey))
                 .Distinct();
 
-        public IDictionary<string, Neuron> ExternalReferences { get; private set; }
+        public IDictionary<string, Neuron> Mirrors { get; private set; }
 
         public static neurULizerTypeInfo GetTypeInfo<T>(T instance = null)
             where T : class
         {
             var result = new neurULizerTypeInfo();
 
-            result.ValueClassKey = ExternalReference.ToKeyString(typeof(T));
+            result.ValueClassKey = MirrorConfig.ToKeyString(typeof(T));
 
             var propertyData = typeof(T).GetProperties()
                 .Select(pi => pi.ToPropertyData(instance))

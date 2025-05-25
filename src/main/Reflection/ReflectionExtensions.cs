@@ -35,22 +35,23 @@ namespace ei8.Cortex.Coding.Reflection
                     var propertyValue = instance != null ?
                         property.GetValue(instance)?.ToString() :
                         null;
-                    string propertyKey = ExternalReference.ToKeyString(property);
+                    string propertyKey = MirrorConfig.ToKeyString(property);
 
-                    // if classAttribute was specified
                     var classKey = string.Empty;
 
+                    // if classAttribute was specified
                     if (classAttribute != null)
                     {
+                        // and type was specified
                         if (classAttribute.Type != null)
                             // use classAttribute type
-                            classKey = ExternalReference.ToKeyString(classAttribute.Type);
+                            classKey = MirrorConfig.ToKeyString(classAttribute.Type);
                         else
                             classKey = string.Empty;
                     }
                     else
                         // otherwise, use property type
-                        classKey = ExternalReference.ToKeyString(property.PropertyType);
+                        classKey = MirrorConfig.ToKeyString(property.PropertyType);
 
                     result = new PropertyData(
                         propertyKey,
@@ -78,8 +79,8 @@ namespace ei8.Cortex.Coding.Reflection
                 case nameof(Neuron.Tag):
                     neuronProperty = NeuronPropertyBase<string>.Create<TagProperty>(propertyValue, propertyName);
                     break;
-                case nameof(Neuron.ExternalReferenceUrl):
-                    neuronProperty = NeuronPropertyBase<string>.Create<ExternalReferenceUrlProperty>(propertyValue, propertyName); 
+                case nameof(Neuron.MirrorUrl):
+                    neuronProperty = NeuronPropertyBase<string>.Create<MirrorUrlProperty>(propertyValue, propertyName); 
                     break;
                 case nameof(Neuron.RegionId):
                     neuronProperty = NeuronPropertyBase<Guid?>.Create<RegionIdProperty>(propertyValue, propertyName); 

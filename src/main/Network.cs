@@ -182,5 +182,51 @@ namespace ei8.Cortex.Coding
 
         //    return result;
         //}
+
+        //public IEnumerable<Tuple<int, Neuron>> GetFarthestPresynaptics(Guid id)
+        //{
+        //    var result = Enumerable.Empty<Tuple<int, Neuron>>();
+
+        //    var log = Network.GetPresynapticsWithLevels(
+        //        this,
+        //        id
+        //    );
+
+        //    if (log.Any())
+        //        result = log.Where(l => l.Item1 == log.Max(l2 => l2.Item1));
+
+        //    return result;
+        //}
+
+        //private static IEnumerable<Tuple<int, Neuron>> GetPresynapticsWithLevels(
+        //    Network value,
+        //    Guid id,
+        //    int level = 0
+        //)
+        //{
+        //    var log = new List<Tuple<int, Neuron>>();
+
+        //    Neuron target = null;
+        //    AssertionConcern.AssertArgumentValid(
+        //        i => value.TryGetById<Neuron>(i, out target),
+        //        id,
+        //        $"Neuron with specified '{id}' not found.",
+        //        nameof(id)
+        //    );
+
+        //    foreach (var pre in value.GetPresynapticNeurons(target.Id))
+        //    {
+        //        log.Add(Tuple.Create(level + 1, pre));
+        //        log.AddRange(
+        //            Network.GetPresynapticsWithLevels(
+        //                value,
+        //                pre.Id,
+        //                level + 1
+        //            )
+        //        );
+        //    }
+
+        //    return log;
+        //}
     }
 }

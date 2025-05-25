@@ -7,7 +7,7 @@ namespace ei8.Cortex.Coding
         public Neuron(
             Guid id, 
             string tag, 
-            string externalReferenceUrl, 
+            string mirrorUrl, 
             Guid? regionId,
             string regionTag,
             DateTimeOffset? creationTimestamp,
@@ -18,7 +18,7 @@ namespace ei8.Cortex.Coding
             string unifiedLastModificationAuthorTag,
             string url,
             int version
-            ) : this(id, false, tag, externalReferenceUrl, regionId)
+            ) : this(id, false, tag, mirrorUrl, regionId)
         {
             this.RegionTag = regionTag;
             this.CreationTimestamp = creationTimestamp;
@@ -31,32 +31,32 @@ namespace ei8.Cortex.Coding
             this.Version = version;
         }
 
-        private Neuron(Guid id, bool isTransient, string tag, string externalReferenceUrl, Guid? regionId)
+        private Neuron(Guid id, bool isTransient, string tag, string mirrorUrl, Guid? regionId)
         {
             this.IsTransient = isTransient;
             this.Id = id;
             this.Tag = tag;
-            this.ExternalReferenceUrl = externalReferenceUrl;
+            this.MirrorUrl = mirrorUrl;
             this.RegionId = regionId;
         }
 
         public static Neuron CreateTransient(
             string tag,
-            string externalReferenceUrl,
+            string mirrorUrl,
             Guid? regionId
-            ) => Neuron.CreateTransient(Guid.NewGuid(), tag, externalReferenceUrl, regionId);
+            ) => Neuron.CreateTransient(Guid.NewGuid(), tag, mirrorUrl, regionId);
 
         public static Neuron CreateTransient(
             Guid id, 
             string tag, 
-            string externalReferenceUrl, 
+            string mirrorUrl, 
             Guid? regionId
-            ) => new Neuron(id, true, tag, externalReferenceUrl, regionId);
+            ) => new Neuron(id, true, tag, mirrorUrl, regionId);
 
         public static Neuron CloneAsPersistent(Neuron original) => new Neuron(
             original.Id,
             original.Tag,
-            original.ExternalReferenceUrl,
+            original.MirrorUrl,
             original.RegionId,
             original.RegionTag,
             original.CreationTimestamp,
@@ -73,7 +73,7 @@ namespace ei8.Cortex.Coding
         
         public Guid Id { get; private set; }
         public string Tag { get; set; }
-        public string ExternalReferenceUrl { get; set; }
+        public string MirrorUrl { get; set; }
         public Guid? RegionId { get; set; }
         public string RegionTag { get; private set; }
         public DateTimeOffset? CreationTimestamp { get; private set; }

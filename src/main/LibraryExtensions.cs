@@ -14,10 +14,10 @@ namespace ei8.Cortex.Coding
 
             var eNs = allNs.GroupBy(n => n.Id)
                 .Select(g => g.First())
-                .Select(n => n.ToNetwork());
+                .Select(n => n.ToNetworkItem());
             var eTs = allTs.GroupBy(t => t.Id)
                 .Select(g => g.First())
-                .Select(t => t.ToNetwork());
+                .Select(t => t.ToNetworkItem());
 
             return new Network(
                 eNs.Cast<INetworkItem>().Concat(
@@ -33,10 +33,10 @@ namespace ei8.Cortex.Coding
 
             var eNs = allNs.GroupBy(n => n.Id)
                 .Select(g => g.First())
-                .Select(n => n.ToNetwork());
+                .Select(n => n.ToNetworkItem());
             var eTs = allTs.GroupBy(t => t.Id)
                 .Select(g => g.First())
-                .Select(t => t.ToNetwork());
+                .Select(t => t.ToNetworkItem());
 
             return new Network(
                 eNs.Cast<INetworkItem>().Concat(
@@ -45,7 +45,7 @@ namespace ei8.Cortex.Coding
             );
         }
 
-        public static Neuron ToNetwork(
+        public static Neuron ToNetworkItem(
             this Library.Common.Neuron value
             ) => new Neuron(
                 Guid.Parse(value.Id),
@@ -63,7 +63,7 @@ namespace ei8.Cortex.Coding
                 value.Version
             );
 
-        public static Terminal ToNetwork(
+        public static Terminal ToNetworkItem(
             this Library.Common.Terminal value
         )
         {

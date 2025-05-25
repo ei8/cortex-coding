@@ -13,13 +13,14 @@ namespace ei8.Cortex.Coding
         /// <param name="value"></param>
         /// <param name="typeInfo"></param>
         /// <param name="idPropertyValueNeurons"></param>
-        /// <param name="externalReferences"></param>
+        /// <param name="mirrors"></param>
         /// <returns></returns>
         Network neurULize<TValue>(
             TValue value, 
             neurULizerTypeInfo typeInfo,
+            // TODO:0 pass just an IEnumerable?
             IDictionary<Guid, Coding.Neuron> idPropertyValueNeurons,
-            IDictionary<string, Coding.Neuron> externalReferences            
+            IDictionary<string, Coding.Neuron> mirrors
         )
             where TValue : class;
 
@@ -30,13 +31,13 @@ namespace ei8.Cortex.Coding
         /// <param name="value"></param>
         /// <param name="instanceNeurons"></param>
         /// <param name="typeInfo"></param>
-        /// <param name="externalReferences"></param>
+        /// <param name="mirrors"></param>
         /// <returns></returns>
-        IEnumerable<TValue> DeneurULize<TValue>(
+        IEnumerable<neurULizationResult<TValue>> DeneurULize<TValue>(
             Network value, 
             IEnumerable<Neuron> instanceNeurons,
             neurULizerTypeInfo typeInfo,
-            IDictionary<string, Coding.Neuron> externalReferences
+            IDictionary<string, Coding.Neuron> mirrors
         )
             where TValue : class, new();
 
