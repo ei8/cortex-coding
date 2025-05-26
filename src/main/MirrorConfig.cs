@@ -11,7 +11,7 @@ namespace ei8.Cortex.Coding
         public string Url { get; set; }
         public string Key { get; set; }
 
-        // TODO:1 transfer elsewhere so Key formulation can be dialect agnostic (ie. code below can be specific to d#)
+        // TODO:1 transfer elsewhere so Key formulation can be dialect specific (ie. code below can be specific to d#)
         public static string ToKeyString(Enum value) => value.ToString();
 
         public static string ToKeyString(MemberInfo value)

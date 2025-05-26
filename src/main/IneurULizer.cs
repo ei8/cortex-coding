@@ -1,5 +1,4 @@
 ﻿using ei8.Cortex.Coding.Reflection;
-using System;
 using System.Collections.Generic;
 
 namespace ei8.Cortex.Coding
@@ -11,15 +10,14 @@ namespace ei8.Cortex.Coding
         /// </summary>
         /// <typeparam name="TValue"></typeparam>
         /// <param name="value"></param>
-        /// <param name="typeInfo"></param>
         /// <param name="idPropertyValueNeurons"></param>
+        /// <param name="typeInfo"></param>
         /// <param name="mirrors"></param>
         /// <returns></returns>
         Network neurULize<TValue>(
-            TValue value, 
+            TValue value,
+            IEnumerable<Coding.Neuron> idPropertyValueNeurons,
             neurULizerTypeInfo typeInfo,
-            // TODO:0 pass just an IEnumerable?
-            IDictionary<Guid, Coding.Neuron> idPropertyValueNeurons,
             IDictionary<string, Coding.Neuron> mirrors
         )
             where TValue : class;
