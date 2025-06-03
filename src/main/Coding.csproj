@@ -8,11 +8,11 @@
     <PackageVersion>0.0.8</PackageVersion>
     <Authors>Elmer Roderick Niem Bool</Authors>
     <Description>Cortex Coding</Description>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageReleaseNotes>Initial commit.</PackageReleaseNotes>
     <PackageTags>cortex coding</PackageTags>
     <Version>0.0.8</Version>
-    <PackageLicenseUrl>https://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
+    <PackageLicenseUrl>https://www.gnu.org/licenses/agpl-3.0.en.html</PackageLicenseUrl>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>
 
