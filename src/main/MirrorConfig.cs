@@ -23,7 +23,7 @@ namespace ei8.Cortex.Coding
             if (erka != null)
                 key = erka.Key;
             else if (value is PropertyInfo pi)
-                key = $"{MirrorConfig.ToKeyString(pi.DeclaringType)}{Constants.TypeNamePropertyNameSeparator}{pi.Name}";
+                key = $"{MirrorConfig.ToKeyString(pi.ReflectedType)}{Constants.TypeNamePropertyNameSeparator}{pi.Name}";
             else if (value is Type t)
                 // assembly qualified name 
                 key = Nullable.GetUnderlyingType(t) != null ? Nullable.GetUnderlyingType(t).FullName : t.FullName;

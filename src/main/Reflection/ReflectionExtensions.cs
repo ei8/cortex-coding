@@ -28,13 +28,27 @@ namespace ei8.Cortex.Coding.Reflection
                     var classAttribute = property.GetCustomAttributes<neurULClassAttribute>().SingleOrDefault();
                     // if property type is Guid and property is decorated by classAttribute
                     var matchBy = property.PropertyType == typeof(Guid) && classAttribute != null ?
-                            // match by id
-                            ValueMatchBy.Id :
-                            // otherwise, match by tag
-                            ValueMatchBy.Tag;
-                    var propertyValue = instance != null ?
-                        property.GetValue(instance)?.ToString() :
-                        null;
+                        // match by id
+                        ValueMatchBy.Id :
+                        // otherwise, match by tag
+                        ValueMatchBy.Tag;
+
+                    string propertyValue = null;
+
+                    if (instance != null)
+                    {
+                        var propInitValue = property.GetValue(instance);
+                        if (propInitValue != null)
+                        {
+                            if (property.PropertyType == typeof(DateTimeOffset))
+                                // ei8.Cortex.Coding.d23.neurULization.Implementation.neurULizer.DeneurULize
+                                // uses "o" format-specifier (RoundtripKind)
+                                propertyValue = ((DateTimeOffset) propInitValue).ToUniversalTime().ToString("o");
+                            else if (propInitValue != null)
+                                propertyValue = propInitValue.ToString();
+                        }
+                    }
+
                     string propertyKey = MirrorConfig.ToKeyString(property);
 
                     var classKey = string.Empty;
