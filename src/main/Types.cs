@@ -24,4 +24,13 @@ namespace ei8.Cortex.Coding
     {
         public const string TypeNamePropertyNameSeparator = ":";
     }
+
+    /// <summary>
+    /// Defines the type of Cache.
+    /// </summary>
+    public enum CacheKey
+    {
+        Write,
+        Read
+    }
 }

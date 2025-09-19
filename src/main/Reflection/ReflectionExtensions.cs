@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using ei8.Cortex.Coding.Properties;
@@ -6,7 +7,7 @@ using ei8.Cortex.Coding.Properties.Neuron;
 
 namespace ei8.Cortex.Coding.Reflection
 {
-    internal static class ReflectionExtensions
+    public static class ReflectionExtensions
     {
         internal static PropertyData ToPropertyData(this PropertyInfo property, object instance = null)
         {
@@ -133,6 +134,27 @@ namespace ei8.Cortex.Coding.Reflection
             if (neuronProperty != null)
                 result = new PropertyData(neuronProperty);
         
+            return result;
+        }
+
+        /// <summary>
+        /// Gets Mirror keys from the specified Types and the applicable members thereof.
+        /// </summary>
+        /// <param name="types"></param>
+        /// <returns></returns>
+        public static IEnumerable<object> GetMirrorKeys(params Type[] types)
+        {
+            var result = new List<object>();
+
+            foreach (var type in types)
+            {
+                result.Add(type);
+                result.AddRange(
+                    type.GetProperties()
+                        .Where(prop => !prop.GetCustomAttributes<neurULNeuronPropertyAttribute>().Any())
+                );
+            }
+
             return result;
         }
     }

@@ -4,7 +4,8 @@ using System;
 namespace ei8.Cortex.Coding.Versioning
 {
     /// <summary>
-    /// Represents the base class for Operations.
+    /// Represents the base class for Operation Events. Used by instances to log Aggregate-scope events 
+    /// that occur outside of a granny neuron and thus may not be recorded in its Timestamps.
     /// </summary>
     public abstract class OperationBase
     {
