@@ -1,36 +1,13 @@
 ﻿using System;
-using System.Linq;
-using System.Reflection;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using ei8.Cortex.Coding.Properties;
 
 namespace ei8.Cortex.Coding
 {
     public class MirrorConfig
     {
         public string Url { get; set; }
-        public string Key { get; set; }
-
-        // TODO:1 transfer elsewhere so Key formulation can be dialect specific (ie. code below can be specific to d#)
-        public static string ToKeyString(Enum value) => value.ToString();
-
-        public static string ToKeyString(MemberInfo value)
-        {
-            // get neurULKeyAttribute of root type
-            var erka = value.GetCustomAttributes<neurULKeyAttribute>().SingleOrDefault();
-            string key;
-            // if attribute exists
-            if (erka != null)
-                key = erka.Key;
-            else if (value is PropertyInfo pi)
-                key = $"{MirrorConfig.ToKeyString(pi.ReflectedType)}{Constants.TypeNamePropertyNameSeparator}{pi.Name}";
-            else if (value is Type t)
-                // assembly qualified name 
-                key = Nullable.GetUnderlyingType(t) != null ? Nullable.GetUnderlyingType(t).FullName : t.FullName;
-            else
-                throw new ArgumentOutOfRangeException(nameof(value));
-            return key;
-        }
+        public IEnumerable<string> Keys { get; set; }
 
         public static bool TryProcessUrl(string neuronUrl, out string avatarUrl, out Guid id)
         {

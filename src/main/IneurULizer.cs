@@ -1,4 +1,4 @@
-﻿using ei8.Cortex.Coding.Reflection;
+﻿using ei8.Cortex.Coding.Model.Reflection;
 using System.Collections.Generic;
 
 namespace ei8.Cortex.Coding
