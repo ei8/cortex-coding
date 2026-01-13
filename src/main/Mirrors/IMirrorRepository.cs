@@ -23,7 +23,7 @@ namespace ei8.Cortex.Coding.Mirrors
         Task Save(IEnumerable<Neuron> values);
 
         /// <summary>
-        /// Gets the MirrorConfigs using the specified keys that are not found in Persistence.
+        /// Gets the MirrorConfigs matching the specified keys that are not found in Persistence.
         /// </summary>
         /// <param name="keys"></param>
         /// <returns></returns>
