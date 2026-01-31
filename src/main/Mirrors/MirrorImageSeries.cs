@@ -61,7 +61,12 @@ namespace ei8.Cortex.Coding.Mirrors
         /// <summary>
         /// Gets the ID.
         /// </summary>
-        public Guid? Id => this.Items.FirstOrDefault()?.Id;
+        public Guid? Id => this.First?.Id;
+
+        /// <summary>
+        /// Gets the first item in the series.
+        /// </summary>
+        public T First => this.Items.FirstOrDefault();
 
         protected override void InsertItem(int index, T item)
         {

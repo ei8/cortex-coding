@@ -13,5 +13,10 @@ namespace ei8.Cortex.Coding.Mirrors
         /// Gets the ID.
         /// </summary>
         Guid? Id { get; }
+
+        /// <summary>
+        /// Gets the first item in the series.
+        /// </summary>
+        T First { get; }
     }
 }
