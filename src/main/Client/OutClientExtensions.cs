@@ -21,7 +21,7 @@ namespace ei8.Cortex.Coding.Client
         /// <param name="bearerToken"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        public static async Task<IEnumerable<IMirrorImageSeries<T>>> AuthGetMirrorImageSeriesAsync<T>(
+        public static async Task<(IEnumerable<IMirrorImageSeries<T>> Result, HttpResponseMessage Response)> AuthGetMirrorImageSeriesAsync<T>(
             this HttpClient client, 
             string requestUri, 
             string bearerToken,
@@ -37,13 +37,16 @@ namespace ei8.Cortex.Coding.Client
                 token
             );
 
-            response.EnsureSuccessStatusCode();
-            var responseText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            IList<IMirrorImageSeries<T>> resultSeries = null;
+            if (response.IsSuccessStatusCode)
+            {
+                var responseText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-            var result = IMirrorImageSeriesExtensions.CreateList<T>();
-            result.ReadJson(responseText);
+                resultSeries = IMirrorImageSeriesExtensions.CreateList<T>();
+                resultSeries.ReadJson(responseText);
+            }
 
-            return result;
+            return (resultSeries, response);
         }
     }
 }
