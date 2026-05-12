@@ -26,10 +26,11 @@ namespace ei8.Cortex.Coding.Mirrors
         /// <param name="avatarUrl"></param>
         /// <param name="id"></param>
         /// <returns></returns>
-        public static bool TryProcessUrl(string neuronUrl, out string avatarUrl, out Guid id)
+        public static bool TryProcessUrl(string neuronUrl, out string avatarUrl, out Guid? id)
         {
             bool result = false;
             avatarUrl = null;
+            id = null;
             if (Uri.TryCreate(neuronUrl, UriKind.Absolute, out Uri auri))
             {
                 var match = Regex.Match(auri.AbsoluteUri, "(?<AvatarUrl>.*)\\/cortex\\/neurons\\/(?<Id>.*)?");

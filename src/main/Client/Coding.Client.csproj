@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	  <TargetFramework>netstandard2.0</TargetFramework>
+	  <TargetFramework>netstandard2.1</TargetFramework>
 	  <AssemblyName>ei8.Cortex.Coding.Client</AssemblyName>
 	  <RootNamespace>ei8.Cortex.Coding.Client</RootNamespace>
 	  <PackageId>ei8.Cortex.Coding.Client</PackageId>

@@ -158,8 +158,6 @@ namespace ei8.Cortex.Coding.Model.Reflection
             return result;
         }
 
-        public static string ToKeyString(this Enum value) => value.ToString();
-
         public static string ToKeyString(this MemberInfo value)
         {
             // get neurULKeyAttribute of root type
@@ -176,6 +174,32 @@ namespace ei8.Cortex.Coding.Model.Reflection
             else
                 throw new ArgumentOutOfRangeException(nameof(value));
             return key;
+        }
+
+        public static string ToKeyString(this Enum value)
+        {
+            return $"{value.GetType().ToKeyString()}|{value.ToString()}";
+        }
+
+        public static string ToMethodKeyString(this Type type, string methodName, params Type[] parameterTypes)
+        {
+            return type.GetMethod(
+                methodName,
+                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
+                null,
+                parameterTypes,
+                null
+            )!.ToMethodKeyString();
+        }
+
+        public static string ToMethodKeyString(this MethodInfo value)
+        {
+            if (value is MethodInfo methodInfo)
+            {
+                return methodInfo.ReflectedType.ToKeyString() + ";" + methodInfo.Name;
+            }
+
+            throw new ArgumentOutOfRangeException(nameof(value));
         }
     }
 }
