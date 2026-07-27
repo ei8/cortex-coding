@@ -8,6 +8,11 @@ namespace ei8.Cortex.Coding
 {
     public static class NetworkExtensions
     {
+        /// <summary>
+        /// Adds or replaces items in the Network with the specified items.
+        /// </summary>
+        /// <param name="network"></param>
+        /// <param name="items"></param>
         public static void AddReplaceItems(this Network network, IEnumerable<INetworkItem> items) =>
             items.ToList().ForEach(ni => network.AddReplace(ni));
 
