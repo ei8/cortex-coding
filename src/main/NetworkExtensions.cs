@@ -8,6 +8,9 @@ namespace ei8.Cortex.Coding
 {
     public static class NetworkExtensions
     {
+        public static void AddReplaceItems(this Network network, IEnumerable<INetworkItem> items) =>
+            items.ToList().ForEach(ni => network.AddReplace(ni));
+
         public static void ValidateIds(this Network value, IEnumerable<Guid> ids)
         {
             var missingIds = ids.Where(id => !value.TryGetById(id, out Neuron result));
