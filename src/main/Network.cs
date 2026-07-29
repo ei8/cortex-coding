@@ -5,40 +5,15 @@ using System.Linq;
 
 namespace ei8.Cortex.Coding
 {
-    public class Network
+    public class Network : ReadOnlyNetwork
     {
-        private readonly IDictionary<Guid, INetworkItem> itemsDictionary;
-
         public Network() : this(new Dictionary<Guid, INetworkItem>())
         {
         }
 
-        public Network(IDictionary<Guid, INetworkItem> itemsDictionary) =>
-            this.itemsDictionary = itemsDictionary;
-
-        public bool TryGetById<T>(
-                Guid id,
-                out T result
-            )
-            where T : INetworkItem
-        {
-            bool bResult = false;
-            result = default;
-
-            if (itemsDictionary.TryGetValue(id, out INetworkItem tryResult))
-            {
-                result = (T)tryResult;
-                bResult = true;
-            }
-
-            return bResult;
+        public Network(IDictionary<Guid, INetworkItem> itemsDictionary) : base(itemsDictionary) 
+        { 
         }
-
-        public IEnumerable<INetworkItem> GetItems() => this.GetItems<INetworkItem>();
-
-        public IEnumerable<T> GetItems<T>()
-            where T : INetworkItem
-            => itemsDictionary.Values.OfType<T>();
 
         public void AddReplace(INetworkItem item)
         {
@@ -80,65 +55,15 @@ namespace ei8.Cortex.Coding
                 );
         }
 
-        public void AddReplaceItems(Network network)
+        public void AddReplaceItems(ReadOnlyNetwork network)
         {
-            var commonItemsInNewDictionary = network.itemsDictionary.Where(item => itemsDictionary.ContainsKey(item.Key)).ToList();
+            var commonItemsInNewDictionary = network.GetItems().Where(item => this.itemsDictionary.ContainsKey(item.Id)).ToList();
             // validate all common items in specified network
-            commonItemsInNewDictionary.ForEach(ci => Network.ValidateItemReplacementType(ci.Value, itemsDictionary[ci.Key]));
-            network.itemsDictionary.ToList().ForEach(ni => Network.AddReplaceCore(ni.Value, itemsDictionary, commonItemsInNewDictionary.Contains(ni)));
+            commonItemsInNewDictionary.ForEach(ci => Network.ValidateItemReplacementType(ci, itemsDictionary[ci.Id]));
+            network.GetItems().ToList().ForEach(ni => Network.AddReplaceCore(ni, itemsDictionary, commonItemsInNewDictionary.Contains(ni)));
         }
 
         public void Remove(Guid id) => this.itemsDictionary.Remove(id);
-
-        public IEnumerable<Terminal> GetDendrites(Guid neuronId) =>
-            this.GetItems<Terminal>().Where(t => t.PostsynapticNeuronId == neuronId);
-
-        public IEnumerable<Terminal> GetTerminals(Guid neuronId) =>
-            this.GetItems<Terminal>().Where(t => t.PresynapticNeuronId == neuronId);
-
-        public IEnumerable<Neuron> GetPresynapticNeurons(Guid neuronId)
-        {
-            return this.GetDendrites(neuronId)
-                 .Select(t =>
-                 {
-                     this.TryGetById(t.PresynapticNeuronId, out Neuron result);
-                     neurUL.Common.Domain.Model.AssertionConcern.AssertStateTrue(
-                         result != null,
-                         $"Neuron with specified Presynaptic Neuron Id of '{t.PresynapticNeuronId}' was not found."
-                         );
-                     return result;
-                 });
-        }
-
-        public IEnumerable<Neuron> GetPostsynapticNeurons(Guid neuronId)
-        {
-            var terminals = this.GetTerminals(neuronId);
-            return terminals.Select(t =>
-                 {
-                     neurUL.Common.Domain.Model.AssertionConcern.AssertStateTrue(
-                         this.TryGetById(t.PostsynapticNeuronId, out Neuron result),
-                         "Neuron with specified Postsynaptic Neuron Id was not found."
-                         );
-                     return result;
-                 });
-        }
-
-        public bool AnyTransient() => this.itemsDictionary.Values.Any(i => i.IsTransient);
-
-        public bool TryGetByTag(string tag, out IEnumerable<Neuron> result)
-        {
-            bool result2 = false;
-            result = null;
-            var matches = this.GetItems<Neuron>().Where(n => n.Tag == tag);
-
-            if (matches.Any())
-            {
-                result = matches;
-                result2 = true;
-            }
-
-            return result2;
-        }
 
         // TODO: enable if needed by client code
         // public IDictionary<T, Neuron> GetInterneurons<T>(
